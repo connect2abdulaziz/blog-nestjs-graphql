@@ -1,0 +1,36 @@
+export const Routes = {
+  GLOBAL_ROUTE: 'api/v1',
+   
+  AUTH: 'auth',
+  SIGNUP: 'signup',
+  LOGIN: 'login',
+  VERIFY_EMAIL: 'verify-email',
+  SIGNOUT: 'signout',
+  FORGOT_PASSWORD: 'forgot-password',
+  RESET_PASSWORD: 'reset-password',
+
+  USERS: 'users',
+  UPDATE_PASSWORD: 'update-password',
+  UPLOAD_PROFILE_IMAGE: 'upload-profile-image',
+  GET_ALL_USERS: 'get-all-users',
+  CREATE_USER: 'create-user',
+  GET_USER: 'get-user',
+  UPDATE_USER: 'update-user',
+  DELETE_USER: 'delete-user',
+
+  POSTS: 'posts',
+  GET_POSTS: 'get-posts',
+  GET_USER_POSTS: 'get-user-posts',
+  CREATE_POST: 'create-post',
+  GET_POST: 'get-post',
+  UPDATE_POST: 'update-post',
+  DELETE_POST: 'delete-post',
+
+  COMMENTS: 'comments',
+  GET_POST_COMMENTS: 'get-post-comments',
+  GET_USER_COMMENTS: 'get-user-comments',
+  CREATE_COMMENT: 'create-comment',
+  GET_COMMENT: 'get-comment',
+  UPDATE_COMMENT: 'update-comment',
+  DELETE_COMMENT: 'delete-comment',
+};

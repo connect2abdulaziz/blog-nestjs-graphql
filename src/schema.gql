@@ -1,0 +1,127 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Post {
+  title: String!
+  content: String!
+  thumbnail: String
+  coverImage: String
+  tag: String!
+  user: User!
+  comments: [Comment!]!
+}
+
+type Comment {
+  content: String!
+  post: Post!
+  user: User!
+  parent: Comment
+  replies: [Comment!]!
+}
+
+type User {
+  firstName: String!
+  lastName: String!
+  posts: [Post!]!
+  comments: [Comment!]!
+  email: String!
+  password: String!
+  isVerified: Boolean!
+  verificationToken: String
+  profileImage: String
+  thumbnail: String
+}
+
+type ApiResponse {
+  status: String!
+  message: String!
+  data: Boolean!
+}
+
+type LoginResponse {
+  id: Float!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type Query {
+  signout: Boolean!
+  users: [User!]!
+  user(id: Int!): User!
+  posts: [Post!]!
+  post(id: Int!): Post!
+  comments: [Comment!]!
+  comment(id: Int!): Comment!
+}
+
+type Mutation {
+  signup(signupInput: SignupInput!): ApiResponse!
+  login(loginInput: LoginInput!): LoginResponse!
+  verifyEmail(token: String!): ApiResponse!
+  forgotPassword(forgotPasswordInput: ForgotPasswordInput!): ApiResponse!
+  resetPassword(token: String!, resetPasswordInput: ResetPasswordInput!): ApiResponse!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: Int!): Post!
+  createComment(createCommentInput: CreateCommentInput!): Comment!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
+  removeComment(id: Int!): Comment!
+}
+
+input SignupInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  confirmPassword: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+}
+
+input CreateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreatePostInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdatePostInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
