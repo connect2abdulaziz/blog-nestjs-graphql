@@ -17,8 +17,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as sgMail from '@sendgrid/mail';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { ApiResponse, LoginResponse } from './dto/api-response.dto';
-import { ErrorMessages } from 'src/constants/messages.constants';
+import { ApiResponse, LoginData } from './dto/api-response.dto';
+import {
+  ErrorMessages,
+  SuccessMessages,
+  StatusCode,
+} from 'src/constants/messages.constants';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +38,7 @@ export class AuthService {
     );
   }
 
-  async signup(signupInput: SignupInput): Promise<ApiResponse<Boolean>> {
+  async signup(signupInput: SignupInput): Promise<ApiResponse> {
     const existingUser = await this.userRepository.findOne({
       where: { email: signupInput.email },
     });
@@ -58,13 +62,12 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return {
-      status: 'success',
-      message: 'User registered successfully. Please verify your email.',
-      data: true
+      statusCode: StatusCode.CREATED, 
+      message: SuccessMessages.USER_REGISTERED_SUCCESS,
     };
   }
 
-  async verifyEmail(token: string): Promise<ApiResponse<Boolean>> {
+  async verifyEmail(token: string): Promise<ApiResponse> {
     const user = await this.userRepository.findOne({
       where: { verificationToken: token },
     });
@@ -82,50 +85,60 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return {
-      status: 'success',
-      message: 'Email verified successfully.',
-      data: true,
+      statusCode: StatusCode.OK, // Status code for successful operation
+      message: SuccessMessages.EMAIL_VERIFIED_SUCCESS,
     };
   }
 
-  async login(loginInput: LoginInput): Promise<LoginResponse> {
+  async login(loginInput: LoginInput): Promise<ApiResponse> {
+    // Find user by email
     const user = await this.userRepository.findOne({
       where: { email: loginInput.email },
     });
-    console.log(user);
 
-    if (!user || (await bcrypt.compare(loginInput.password, user?.password))) {
-      throw new UnauthorizedException(ErrorMessages.INVALID_CREDENTIALS);
+    if (!user || !(await bcrypt.compare(loginInput.password, user.password))) {
+      throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_OR_PASSWORD);
     }
 
+    // Check if the user's email is verified
     if (!user.isVerified) {
       await this.emailService.sendVerificationEmail(
         user.email,
         user.verificationToken,
       );
-
       throw new UnauthorizedException(ErrorMessages.EMAIL_NOT_VERIFIED);
     }
 
+    // Create the payload for the JWT
     const payload = {
       sub: user.id.toString(),
       username: `${user.firstName} ${user.lastName}`,
     };
-    console.log(payload);
-    const accessToken = await this.jwtService.signAsync(payload);
-    const refreshToken = await this.jwtService.signAsync(payload);
 
-    console.log(accessToken, refreshToken);
-    return {
+    // Generate access and refresh tokens
+    const accessToken = await this.jwtService.signAsync(payload);
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRES_IN'),
+    });
+    
+
+    const responseData: LoginData = {
       id: user.id,
       accessToken,
       refreshToken,
+    };
+
+    return {
+      statusCode: StatusCode.OK, // Status code for successful operation
+      message: SuccessMessages.LOGIN_SUCCESS,
+      data: responseData
     };
   }
 
   async forgotPassword(
     forgotPasswordInput: ForgotPasswordInput,
-  ): Promise<ApiResponse<Boolean>> {
+  ): Promise<ApiResponse> {
     const user = await this.userRepository.findOne({
       where: { email: forgotPasswordInput.email },
     });
@@ -144,16 +157,15 @@ export class AuthService {
     );
 
     return {
-      status: 'success',
-      message: 'Password reset email sent.',
-      data: true,
+      statusCode: StatusCode.OK, // Status code for successful operation
+      message: SuccessMessages.PASSWORD_RESET_EMAIL_SENT,
     };
   }
 
   async resetPassword(
     token: string,
     resetPasswordInput: ResetPasswordInput,
-  ): Promise<ApiResponse<Boolean>> {
+  ): Promise<ApiResponse> {
     const user = await this.userRepository.findOne({
       where: { verificationToken: token },
     });
@@ -162,14 +174,13 @@ export class AuthService {
       throw new BadRequestException(ErrorMessages.INVALID_TOKEN);
     }
 
-    user.password = await bcrypt.hash(resetPasswordInput.newPassword, 10);
+    user.password = resetPasswordInput.newPassword;
     user.verificationToken = '';
     await this.userRepository.save(user);
 
     return {
-      status: 'success',
-      message: 'Password reset successful.',
-      data: true
+      statusCode: StatusCode.OK, 
+      message: SuccessMessages.PASSWORD_RESET_SUCCESS,
     };
   }
 }

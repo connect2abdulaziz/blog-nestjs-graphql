@@ -33,16 +33,16 @@ type User {
   thumbnail: String
 }
 
-type ApiResponse {
-  status: String!
-  message: String!
-  data: Boolean!
-}
-
-type LoginResponse {
+type LoginData {
   id: Float!
   accessToken: String!
   refreshToken: String!
+}
+
+type ApiResponse {
+  statusCode: Float!
+  message: String!
+  data: LoginData
 }
 
 type Query {
@@ -57,7 +57,7 @@ type Query {
 
 type Mutation {
   signup(signupInput: SignupInput!): ApiResponse!
-  login(loginInput: LoginInput!): LoginResponse!
+  login(loginInput: LoginInput!): ApiResponse!
   verifyEmail(token: String!): ApiResponse!
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): ApiResponse!
   resetPassword(token: String!, resetPasswordInput: ResetPasswordInput!): ApiResponse!

@@ -1,28 +1,9 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { User } from '../../users/entities/user.entity';
 
-// Generic ApiResponse class for all types of responses
-@ObjectType()
-export class ApiResponse<T> {
-  @Field()
-  status: 'success' | 'error';  // Response status
-
-  @Field()
-  message: string;               // Message giving context to the response
-
-  @Field() // Specify that `data` can be any object type
-  data: boolean;
-}
-
-@ObjectType()
-export class data {
-  @Field(() => Object, { nullable: true })
-  user: User;
-}
 
 // Specific response for login
 @ObjectType()
-export class LoginResponse {
+export class LoginData {
   @Field()
   id: number; // Use number or string based on your user ID type
 
@@ -32,3 +13,17 @@ export class LoginResponse {
   @Field()
   refreshToken: string;
 }
+
+// Generic ApiResponse class for all types of responses
+@ObjectType()
+export class ApiResponse {
+  @Field()
+  statusCode: number;  
+
+  @Field()
+  message: string;               // Message giving context to the response
+
+  @Field(() => LoginData, { nullable: true }) // Specify that `data` can be a LoginData object
+  data?: LoginData;              // Use `?` to indicate that this field can be optional
+}
+

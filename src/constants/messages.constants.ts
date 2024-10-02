@@ -1,13 +1,11 @@
 // src/constants/messages.constants.ts
 
 export const SuccessMessages = {
+  USER_REGISTERED_SUCCESS: 'User registered successfully. Please verify your email.',
+  EMAIL_VERIFIED_SUCCESS: 'Email verified successfully.',
   LOGIN_SUCCESS: 'Login successful.',
-  SIGNUP_SUCCESS: 'Signup successful.',
-  VERIFICATION_SUCCESS: 'Verification successful.',
-  EMAIL_VERIFICATION_SENT: 'Verification email sent.',
-  LOGOUT_SUCCESS: 'Logout successful.',
-  FORGOT_SUCCESS: 'Password reset link sent.',
-  RESET_SUCCESS: 'Password reset successful',
+  PASSWORD_RESET_EMAIL_SENT: 'Password reset email sent.',
+  PASSWORD_RESET_SUCCESS: 'Password reset successful.',
 
 
   //USER_SUCCESS
@@ -32,13 +30,13 @@ export const SuccessMessages = {
 
 
 export const ErrorMessages = {
-  EMAIL_ALREADY_EXISTS: 'Email already exists.',
-  INVALID_VERIFICATION_TOKEN: 'Invalid verification token.',
+  EMAIL_ALREADY_EXISTS: 'This email is already registered.',
+  INVALID_VERIFICATION_TOKEN: 'The verification token is invalid.',
   USER_ALREADY_VERIFIED: 'User is already verified.',
-  EMAIL_NOT_VERIFIED: 'Email not verified. A verification link has been sent to your email.',
-  INVALID_CREDENTIALS: 'Invalid credentials.',
+  INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password.',
+  EMAIL_NOT_VERIFIED: 'Email has not been verified yet.',
   EMAIL_NOT_FOUND: 'Email not found.',
-  INVALID_TOKEN: 'Invalid verification token.',
+  INVALID_TOKEN: 'The provided token is invalid.',
 };
 
 
@@ -59,4 +57,14 @@ export const EmailMessages = {
     <a href="${link}">${link}</a>
   `,
 
+};
+
+
+export const StatusCode = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  CONFLICT: 409,
+  // Add more as needed
 };

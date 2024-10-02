@@ -17,8 +17,8 @@ import { CommentsModule } from './comments/comments.module';
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      installSubscriptionHandlers: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      //typePaths: ['./**/*.graphql'],
     }),
 
     // Global configuration module
