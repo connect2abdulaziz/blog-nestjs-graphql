@@ -18,14 +18,12 @@ export const SuccessMessages = {
   USER_UPDATED_PASSWORD: 'Password updated successfully.',
 
   // POST_SUCCESS
-  POST_RETRIEVED: 'Post retrieved successfully.',
-  COMMENT_ADDED: 'Comment added successfully.',
-  DATA_UPDATED: 'Data updated successfully.',
-  DATA_DELETED: 'Data deleted successfully.',
-  PASSWORD_CHANGED: 'Password changed successfully.',
-  PROFILE_UPDATED: 'Profile updated successfully.',
-  ITEM_CREATED: 'Item created successfully.',
-  ITEM_RETRIEVED: 'Item retrieved successfully.',
+  POST_CREATED: 'Post created successfully.',
+  POST_UPDATED: 'Post updated successfully.',
+  POST_DELETED: 'Post deleted successfully.',
+  POST_FOUND: 'Post found successfully.',
+  POST_LIST_SUCCESS: 'Posts fetched successfully.',
+  USER_POSTS_LIST_SUCCESS: 'User posts fetched successfully.',
 
   // COMMENT_SUCCESS
   COMMENT_LIST_SUCCESS: 'Comments retrieved successfully.',
@@ -47,8 +45,13 @@ export const ErrorMessages = {
   TOKEN_EXPIRED: 'The token has expired.',
   UNAUTHORIZED_ACTION: 'You are not authorized to perform this action.',
 
-  USER_NOT_FOUND: 'User not found.',
   POST_NOT_FOUND: 'Post not found.',
+  FORBIDDEN: 'You do not have permission to perform this action.',
+  INTERNAL_SERVER_ERROR: 'An internal server error occurred.',
+  POST_ID_MISSING: 'Post ID missing.',
+  POST_UPDATE_MISSING: 'Post update missing information',
+
+  USER_NOT_FOUND: 'User not found.',
   COMMENT_NOT_FOUND: 'Comment not found.',
   USER_NOT_AUTHORIZED: 'You are not authorized to perform this action.',
   PASSWORD_NOT_UPDATED: 'Password not updated.',

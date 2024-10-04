@@ -3,7 +3,10 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { CommentResponse, PaginatedCommentResponse } from './dto/comments.response';
+import {
+  CommentResponse,
+  PaginatedCommentResponse,
+} from './dto/comments.response';
 import {
   ErrorMessages,
   StatusCode,
@@ -12,48 +15,45 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from 'src/comments/entities/comment.entity';
-import { CreateCommentInput, UpdateCommentInput, GetCommentInput } from './dto/comments.input.dto';
+import {
+  CreateCommentInput,
+  UpdateCommentInput,
+  GetCommentInput,
+} from './dto/comments.input.dto';
 import { FilterInput } from 'src/common/pagenated.input';
+import { PostsService } from'src/posts/posts.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    private readonly postsService: PostsService
   ) {}
 
   async findAll(filter: FilterInput): Promise<PaginatedCommentResponse> {
     const { page, limit, sortBy, sortOrder } = filter;
-
-    const sortField = sortBy ? sortBy : 'createdAt';
+  
+    // Define valid sort fields
+    const validSortFields = ['createdAt', 'updatedAt', 'content']; // Add any other fields you want to allow sorting by
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt'; // Fallback to default
+  
     const order = sortOrder?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-
-    const queryBuilder = this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.user', 'user') // Join with user
-      .skip((page - 1) * limit) // Pagination: Offset
-      .take(limit) // Pagination: Limit
-      .select([
-        'comment.id',
-        'comment.content',
-        'comment.createdAt',
-        'comment.updatedAt',
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-      ]); // Select fields
-
-    // Apply sorting
-    queryBuilder.orderBy(sortField, order);
-
-    // Execute the queries: one for the comment data and another for the total count
+  
+    const queryBuilder = this.commentRepository.createQueryBuilder('comments')
+      .leftJoinAndSelect('comments.user', 'user');
+  
     const [comments, totalCount] = await Promise.all([
-      queryBuilder.getMany(), // Get the paginated comments
-      this.commentRepository.count(), // Count all comments for pagination
+      queryBuilder
+        .skip((page - 1) * limit) // Pagination: Offset
+        .take(limit) // Pagination: Limit
+        .orderBy(`comments.${sortField}`, order) // Safely apply sorting with table alias
+        .getMany(), // Get the comments
+      queryBuilder.getCount(), // Get total count of comments for pagination
     ]);
-
+  
     const totalPages = Math.ceil(totalCount / limit);
-
+  
     return {
       statusCode: StatusCode.OK,
       message: SuccessMessages.COMMENT_LIST_SUCCESS,
@@ -64,12 +64,18 @@ export class CommentsService {
       totalCount,
     };
   }
+  
+  
 
   async findOne(getCommentInput: GetCommentInput): Promise<CommentResponse> {
     const { id } = getCommentInput;
 
     // Find the comment by ID
-    const comment = await this.commentRepository.findOne({ where: { id } });
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+      relations: ['user'], // Use an array for relations
+    });
+    
 
     if (!comment) {
       throw new NotFoundException(ErrorMessages.COMMENT_NOT_FOUND);
@@ -82,22 +88,41 @@ export class CommentsService {
     };
   }
 
-  async create(createCommentInput: CreateCommentInput, userId: number): Promise<CommentResponse> {
+  async create(
+    createCommentInput: CreateCommentInput,
+    userId: number,
+  ): Promise<CommentResponse> {
+    const { postId } = createCommentInput;
+  
+    // Check if the post exists
+    const post = await this.postsService.findOne({id: postId});
+    if (!post) {
+      return {
+        statusCode: StatusCode.NOT_FOUND,
+        message: ErrorMessages.POST_NOT_FOUND,
+        data: null,
+      };
+    }
+  
     const comment = this.commentRepository.create({
       ...createCommentInput,
-      user: { id: userId }, // Associate the comment with the user
+      user: { id: userId }, 
     });
-
+  
     const savedComment = await this.commentRepository.save(comment);
-
+  
     return {
       statusCode: StatusCode.CREATED,
       message: SuccessMessages.COMMENT_CREATED,
       data: savedComment,
     };
   }
+  
 
-  async update(updateCommentInput: UpdateCommentInput, userId: number): Promise<CommentResponse> {
+  async update(
+    updateCommentInput: UpdateCommentInput,
+    userId: number,
+  ): Promise<CommentResponse> {
     const { id } = updateCommentInput;
 
     // Find the comment by ID
@@ -112,7 +137,9 @@ export class CommentsService {
     }
 
     await this.commentRepository.update(id, updateCommentInput);
-    const updatedComment = await this.commentRepository.findOne({ where: { id } });
+    const updatedComment = await this.commentRepository.findOne({
+      where: { id },
+    });
 
     return {
       statusCode: StatusCode.OK,
