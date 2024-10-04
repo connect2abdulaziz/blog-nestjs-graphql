@@ -31,6 +31,14 @@ input CreateCommentInput {
   postId: Int!
 }
 
+input CreatePostInput {
+  content: String!
+  coverImage: String
+  tag: String
+  thumbnail: String
+  title: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -55,6 +63,10 @@ input GetCommentInput {
   includeReplies: Boolean = false
 }
 
+input GetPostInput {
+  id: Int!
+}
+
 input GetUserInput {
   id: Float!
   includeComments: Boolean = false
@@ -74,13 +86,16 @@ input LoginInput {
 
 type Mutation {
   createComment(createCommentInput: CreateCommentInput!): CommentResponse!
+  createPost(createPostInput: CreatePostInput!): PostResponse!
   forgotPassword(forgotPasswordInput: ForgotPasswordInput!): AuthResponse!
   login(loginInput: LoginInput!): AuthResponse!
   removeComment(commentId: Float!): CommentResponse!
+  removePost(postId: Float!): PostResponse!
   removeUser: UserResponse!
   resetPassword(resetPasswordInput: ResetPasswordInput!, token: String!): AuthResponse!
   signup(signupInput: SignupInput!): AuthResponse!
   updateComment(updateCommentInput: UpdateCommentInput!): CommentResponse!
+  updatePost(updatePostInput: UpdatePostInput!): PostResponse!
   updateUser(updateUserInput: UpdateUserInput!): UserResponse!
   verifyEmail(token: String!): AuthResponse!
 }
@@ -88,6 +103,16 @@ type Mutation {
 type PaginatedCommentResponse {
   currentPage: Float!
   data: [Comment!]
+  message: String!
+  pageSize: Float!
+  statusCode: Float!
+  totalCount: Float!
+  totalPages: Float!
+}
+
+type PaginatedPostResponse {
+  currentPage: Float!
+  data: [Post!]
   message: String!
   pageSize: Float!
   statusCode: Float!
@@ -118,12 +143,21 @@ type Post {
   user: User!
 }
 
+type PostResponse {
+  data: Post
+  message: String!
+  statusCode: Float!
+}
+
 type Query {
   comment(getCommentInput: GetCommentInput!): CommentResponse!
   comments(filter: FilterInput!): PaginatedCommentResponse!
   currentUser: UserResponse!
+  post(getPostInput: GetPostInput!): PostResponse!
+  posts(filter: FilterInput!): PaginatedPostResponse!
   signout: Boolean!
   user(getUserInput: GetUserInput!): UserResponse!
+  userPosts(filter: FilterInput!): PaginatedPostResponse!
   users(filter: FilterInput!): PaginatedUserResponse!
 }
 
@@ -142,6 +176,15 @@ input SignupInput {
 input UpdateCommentInput {
   content: String
   id: Float!
+}
+
+input UpdatePostInput {
+  content: String
+  coverImage: String
+  id: Int!
+  tag: String
+  thumbnail: String
+  title: String
 }
 
 input UpdateUserInput {
