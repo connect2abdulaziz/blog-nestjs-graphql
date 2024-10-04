@@ -1,10 +1,8 @@
 import {
   PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Column,
 } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-
 
 // Base entity for all entities in the application.
 @ObjectType()
@@ -13,11 +11,11 @@ export abstract class BaseEntity {
   @Field(() => Int)
   id: number;
 
-  @UpdateDateColumn()
-  @Field({ defaultValue: 'CURRENT_TIMESTAMP' })
+  @Column({ name: 'createdAt', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }) 
+  @Field(() => Date)
   createdAt: Date;
 
-  @CreateDateColumn()
-  @Field({ defaultValue: 'CURRENT_TIMESTAMP' })
+  @Column({ name: 'updatedAt', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }) 
+  @Field(() => Date)
   updatedAt: Date;
 }
