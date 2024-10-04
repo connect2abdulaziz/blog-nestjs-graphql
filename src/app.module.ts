@@ -12,6 +12,7 @@ import { join } from 'path';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
+import { FileUploadModule } from 'src/integrations/s3/file-upload.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CommentsModule } from './comments/comments.module';
       driver: ApolloDriver,
       installSubscriptionHandlers: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
     }),
 
     // Global configuration module
@@ -37,6 +39,7 @@ import { CommentsModule } from './comments/comments.module';
     UsersModule,
     PostsModule,
     CommentsModule,
+    FileUploadModule, 
   ],
   //providers: [UsersResolver, UsersService]
 })

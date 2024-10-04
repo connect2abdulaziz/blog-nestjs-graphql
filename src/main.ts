@@ -52,6 +52,7 @@ async function bootstrap() {
 
   await app.listen(appConfig.port);  // <---- Notice this
   console.log(`Server running on ${appConfig.url}`);
+  console.log(`Test data in the GraphQL play ground on ${appConfig.url}/graphql`);
   
   
   if(module.hot){

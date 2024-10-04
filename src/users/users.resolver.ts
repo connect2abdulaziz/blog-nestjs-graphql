@@ -1,35 +1,53 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common'; 
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
+import { GetUserInput, UpdateUserInput } from 'src/users/dto/users.input.dto';
+import { FilterInput } from 'src/common/pagenated.input';
+import { UserResponse, PaginatedUserResponse } from './dto/users.response';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { GetUserId } from 'src/decorators/get-user-id.decorator';
+//import { Upload } from 'graphql-upload'
 
+@UseGuards(AuthGuard) 
 @Resolver(() => User)
-export class UsersResolver {
+export class UserResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
+  @Query(() => UserResponse, { name: 'user' })
+  async getUser(@Args('getUserInput') getUserInput: GetUserInput): Promise<UserResponse> {
+    return this.usersService.findOne(getUserInput);
   }
 
-  @Query(() => [User], { name: 'users' })
-  findAll() {
-    return this.usersService.findAll();
+  @Query(() => PaginatedUserResponse, { name: 'users' })
+  async getUsers(@Args('filter') filter: FilterInput): Promise<PaginatedUserResponse> {
+    return this.usersService.findAll(filter);
   }
 
-  @Query(() => User, { name: 'user' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.findOne(id);
+  @Query(() => UserResponse, { name: 'currentUser' })
+  async getCurrentUser(@GetUserId() userId: number): Promise<UserResponse> {
+    return this.usersService.findOne({ id: userId });
   }
 
-  @Mutation(() => User)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.usersService.update(updateUserInput.id, updateUserInput);
+  @Mutation(() => UserResponse, { name: 'updateUser' })
+  async updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput, 
+    @GetUserId() userId: number
+  ): Promise<UserResponse> {
+    return this.usersService.update(updateUserInput, userId);
   }
 
-  @Mutation(() => User)
-  removeUser(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.remove(id);
+  @Mutation(() => UserResponse, { name: 'removeUser' })
+  async removeUser(@GetUserId() userId: number): Promise<UserResponse> {
+    return this.usersService.remove(userId);
   }
+
+ 
+  // @Mutation(() => UserResponse, { name: 'uploadProfileImage' })
+  // async uploadProfileImage(
+  //   @Args('userId') userId: number,
+  //   @Args({ name: 'file', type: () => Upload }) file: Express.Multer.File,
+  // ): Promise<UserResponse> {
+  //   return this.usersService.uploadProfileImage(userId, file);
+  // }
 }

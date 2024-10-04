@@ -4,10 +4,12 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginInput } from './dto/login.input';
-import { SignupInput } from './dto/signup.input';
-import { ForgotPasswordInput } from './dto/forgot-password.input';
-import { ResetPasswordInput } from './dto/reset-password.input';
+import {
+  LoginInput,
+  SignupInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from './dto/auth.input.dto';
 import { EmailService } from 'src/integrations/sg/email.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
@@ -17,7 +19,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as sgMail from '@sendgrid/mail';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { ApiResponse, LoginData } from './dto/api-response.dto';
+import { AuthResponse } from './dto/auth.response.dto';
 import {
   ErrorMessages,
   SuccessMessages,
@@ -38,7 +40,7 @@ export class AuthService {
     );
   }
 
-  async signup(signupInput: SignupInput): Promise<ApiResponse> {
+  async signup(signupInput: SignupInput): Promise<AuthResponse> {
     const existingUser = await this.userRepository.findOne({
       where: { email: signupInput.email },
     });
@@ -62,12 +64,12 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return {
-      statusCode: StatusCode.CREATED, 
+      statusCode: StatusCode.CREATED,
       message: SuccessMessages.USER_REGISTERED_SUCCESS,
     };
   }
 
-  async verifyEmail(token: string): Promise<ApiResponse> {
+  async verifyEmail(token: string): Promise<AuthResponse> {
     const user = await this.userRepository.findOne({
       where: { verificationToken: token },
     });
@@ -90,7 +92,7 @@ export class AuthService {
     };
   }
 
-  async login(loginInput: LoginInput): Promise<ApiResponse> {
+  async login(loginInput: LoginInput): Promise<AuthResponse> {
     // Find user by email
     const user = await this.userRepository.findOne({
       where: { email: loginInput.email },
@@ -121,24 +123,21 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRES_IN'),
     });
-    
-
-    const responseData: LoginData = {
-      id: user.id,
-      accessToken,
-      refreshToken,
-    };
 
     return {
-      statusCode: StatusCode.OK, // Status code for successful operation
+      statusCode: StatusCode.OK,
       message: SuccessMessages.LOGIN_SUCCESS,
-      data: responseData
+      data: {
+        id: user.id,
+        accessToken,
+        refreshToken,
+      },
     };
   }
 
   async forgotPassword(
     forgotPasswordInput: ForgotPasswordInput,
-  ): Promise<ApiResponse> {
+  ): Promise<AuthResponse> {
     const user = await this.userRepository.findOne({
       where: { email: forgotPasswordInput.email },
     });
@@ -165,7 +164,7 @@ export class AuthService {
   async resetPassword(
     token: string,
     resetPasswordInput: ResetPasswordInput,
-  ): Promise<ApiResponse> {
+  ): Promise<AuthResponse> {
     const user = await this.userRepository.findOne({
       where: { verificationToken: token },
     });
@@ -179,7 +178,7 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return {
-      statusCode: StatusCode.OK, 
+      statusCode: StatusCode.OK,
       message: SuccessMessages.PASSWORD_RESET_SUCCESS,
     };
   }

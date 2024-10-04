@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-
+import { BaseResponse } from 'src/common/base.response';
 
 // Specific response for login
 @ObjectType()
@@ -14,16 +14,10 @@ export class LoginData {
   refreshToken: string;
 }
 
-// Generic ApiResponse class for all types of responses
+// Generic AuthResponse class for all types of responses
 @ObjectType()
-export class ApiResponse {
-  @Field()
-  statusCode: number;  
-
-  @Field()
-  message: string;               // Message giving context to the response
-
+export class AuthResponse  extends BaseResponse {
+  
   @Field(() => LoginData, { nullable: true }) // Specify that `data` can be a LoginData object
-  data?: LoginData;              // Use `?` to indicate that this field can be optional
+  data?: LoginData; // Use `?` to indicate that this field can be optional
 }
-

@@ -29,8 +29,8 @@ export class User extends BaseEntity {
   email: string;
 
   @Column()
-  @Field()
-  password: string;
+  @Field( )
+  password?: string;
 
   @Column({ default: false })
   @Field({defaultValue: false})
