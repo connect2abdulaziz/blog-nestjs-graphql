@@ -3,9 +3,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Field, Int } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+
 
 // Base entity for all entities in the application.
+@ObjectType()
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn()
   @Field(() => Int)

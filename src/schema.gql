@@ -2,82 +2,69 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Post {
-  title: String!
-  content: String!
-  thumbnail: String
-  coverImage: String
-  tag: String!
-  user: User!
-  comments: [Comment!]!
+type AuthResponse {
+  data: LoginData
+  message: String!
+  statusCode: Float!
 }
 
 type Comment {
   content: String!
-  post: Post!
-  user: User!
+  createdAt: DateTime!
+  id: Int!
   parent: Comment
+  post: Post!
   replies: [Comment!]!
+  updatedAt: DateTime!
+  user: User!
 }
 
-type User {
-  firstName: String!
-  lastName: String!
-  posts: [Post!]!
-  comments: [Comment!]!
+type CommentResponse {
+  data: Comment
+  message: String!
+  statusCode: Float!
+}
+
+input CreateCommentInput {
+  content: String!
+  parentId: Int
+  postId: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input FilterInput {
+  commentId: Int
+  limit: Int! = 10
+  page: Int! = 1
+  postId: Int
+  role: String
+  sortBy: String
+  sortOrder: String
+}
+
+input ForgotPasswordInput {
   email: String!
-  password: String!
-  isVerified: Boolean!
-  verificationToken: String
-  profileImage: String
-  thumbnail: String
+}
+
+input GetCommentInput {
+  id: Float = null
+  includeReplies: Boolean = false
+}
+
+input GetUserInput {
+  id: Float!
+  includeComments: Boolean = false
+  includePosts: Boolean = false
 }
 
 type LoginData {
-  id: Float!
   accessToken: String!
+  id: Float!
   refreshToken: String!
-}
-
-type ApiResponse {
-  statusCode: Float!
-  message: String!
-  data: LoginData
-}
-
-type Query {
-  signout: Boolean!
-  users: [User!]!
-  user(id: Int!): User!
-  posts: [Post!]!
-  post(id: Int!): Post!
-  comments: [Comment!]!
-  comment(id: Int!): Comment!
-}
-
-type Mutation {
-  signup(signupInput: SignupInput!): ApiResponse!
-  login(loginInput: LoginInput!): ApiResponse!
-  verifyEmail(token: String!): ApiResponse!
-  forgotPassword(forgotPasswordInput: ForgotPasswordInput!): ApiResponse!
-  resetPassword(token: String!, resetPasswordInput: ResetPasswordInput!): ApiResponse!
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
-  createPost(createPostInput: CreatePostInput!): Post!
-  updatePost(updatePostInput: UpdatePostInput!): Post!
-  removePost(id: Int!): Post!
-  createComment(createCommentInput: CreateCommentInput!): Comment!
-  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
-  removeComment(id: Int!): Comment!
-}
-
-input SignupInput {
-  firstName: String!
-  lastName: String!
-  email: String!
-  password: String!
-  confirmPassword: String!
 }
 
 input LoginInput {
@@ -85,43 +72,103 @@ input LoginInput {
   password: String!
 }
 
-input ForgotPasswordInput {
-  email: String!
+type Mutation {
+  createComment(createCommentInput: CreateCommentInput!): CommentResponse!
+  forgotPassword(forgotPasswordInput: ForgotPasswordInput!): AuthResponse!
+  login(loginInput: LoginInput!): AuthResponse!
+  removeComment(commentId: Float!): CommentResponse!
+  removeUser: UserResponse!
+  resetPassword(resetPasswordInput: ResetPasswordInput!, token: String!): AuthResponse!
+  signup(signupInput: SignupInput!): AuthResponse!
+  updateComment(updateCommentInput: UpdateCommentInput!): CommentResponse!
+  updateUser(updateUserInput: UpdateUserInput!): UserResponse!
+  verifyEmail(token: String!): AuthResponse!
+}
+
+type PaginatedCommentResponse {
+  currentPage: Float!
+  data: [Comment!]
+  message: String!
+  pageSize: Float!
+  statusCode: Float!
+  totalCount: Float!
+  totalPages: Float!
+}
+
+type PaginatedUserResponse {
+  currentPage: Float!
+  data: [User!]
+  message: String!
+  pageSize: Float!
+  statusCode: Float!
+  totalCount: Float!
+  totalPages: Float!
+}
+
+type Post {
+  comments: [Comment!]!
+  content: String!
+  coverImage: String
+  createdAt: DateTime!
+  id: Int!
+  tag: String!
+  thumbnail: String
+  title: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type Query {
+  comment(getCommentInput: GetCommentInput!): CommentResponse!
+  comments(filter: FilterInput!): PaginatedCommentResponse!
+  currentUser: UserResponse!
+  signout: Boolean!
+  user(getUserInput: GetUserInput!): UserResponse!
+  users(filter: FilterInput!): PaginatedUserResponse!
 }
 
 input ResetPasswordInput {
   newPassword: String!
 }
 
-input CreateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
-input CreatePostInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdatePostInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
-input CreateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+input SignupInput {
+  confirmPassword: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
 }
 
 input UpdateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  content: String
+  id: Float!
+}
+
+input UpdateUserInput {
+  email: String
+  firstName: String
+  lastName: String
+  password: String
+}
+
+type User {
+  comments: [Comment!]!
+  createdAt: DateTime!
+  email: String!
+  firstName: String!
   id: Int!
+  isVerified: Boolean!
+  lastName: String!
+  password: String!
+  posts: [Post!]!
+  profileImage: String
+  thumbnail: String
+  updatedAt: DateTime!
+  verificationToken: String
+}
+
+type UserResponse {
+  data: User
+  message: String!
+  statusCode: Float!
 }

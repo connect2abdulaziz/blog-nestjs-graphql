@@ -26,6 +26,13 @@ export const SuccessMessages = {
   PROFILE_UPDATED: 'Profile updated successfully.',
   ITEM_CREATED: 'Item created successfully.',
   ITEM_RETRIEVED: 'Item retrieved successfully.',
+
+  // COMMENT_SUCCESS
+  COMMENT_LIST_SUCCESS: 'Comments retrieved successfully.',
+  COMMENT_FOUND: 'Comment found successfully.',
+  COMMENT_CREATED: 'Comment created successfully.',
+  COMMENT_UPDATED: 'Comment updated successfully.',
+  COMMENT_DELETED: 'Comment deleted successfully.',
 };
 
 
@@ -37,6 +44,15 @@ export const ErrorMessages = {
   EMAIL_NOT_VERIFIED: 'Email has not been verified yet.',
   EMAIL_NOT_FOUND: 'Email not found.',
   INVALID_TOKEN: 'The provided token is invalid.',
+  TOKEN_EXPIRED: 'The token has expired.',
+  UNAUTHORIZED_ACTION: 'You are not authorized to perform this action.',
+
+  USER_NOT_FOUND: 'User not found.',
+  POST_NOT_FOUND: 'Post not found.',
+  COMMENT_NOT_FOUND: 'Comment not found.',
+  USER_NOT_AUTHORIZED: 'You are not authorized to perform this action.',
+  PASSWORD_NOT_UPDATED: 'Password not updated.',
+  PROFILE_IMAGE_NOT_UPDATED: 'Profile image not updated.',
 };
 
 
@@ -66,5 +82,8 @@ export const StatusCode = {
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   CONFLICT: 409,
+  NOT_FOUND: 404,
+  FORBIDDEN: 403,
+  INTERNAL_SERVER_ERROR: 500,
   // Add more as needed
 };
